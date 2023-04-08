@@ -14,6 +14,7 @@ public class SpiralMain extends JPanel {
     public SpiralMain(int x, int y) {
         setLayout(new BorderLayout());
         JToolBar toolBar = new JToolBar(JToolBar.HORIZONTAL);
+        toolBar.setFloatable( false);
         String[] checkTitles = new String[] { "RED", "BLUE", "GREEN", "MAGENTA" };
         JCheckBox[] checkBoxs = new JCheckBox[4];
         JRadioButton anticlockwiseRadio = new JRadioButton("Anti Clockwise");
@@ -41,7 +42,8 @@ public class SpiralMain extends JPanel {
         angulo.setMinorTickSpacing(5);
         angulo.setPaintLabels(true);
         JToolBar toolBar2 = new JToolBar(JToolBar.HORIZONTAL);
-        toolBar2.add(angulo);
+        toolBar2.setFloatable( false);
+         toolBar2.add(angulo);
         add(toolBar2, BorderLayout.SOUTH);
         SpiralPanel spiral = new SpiralPanel(x, y, 5, anticlockwiseRadio, checkBoxs, showSquares, angulo);
         add(spiral);
