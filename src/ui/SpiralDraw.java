@@ -13,6 +13,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -34,22 +35,27 @@ public class SpiralDraw extends JPanel implements MouseListener, MouseMotionList
     private JRadioButton anticlockwiseRadio;
     private JCheckBox showSquares;
 
+    private JSlider angulo;
+
     /**
      * Constructor
      * 
      * @param checkBoxs
      * @param anticlockwiseRadio
      * @param showSquares
+     * @param angulo
      */
-    public SpiralDraw(JRadioButton anticlockwiseRadio, JCheckBox[] checkBoxs, JCheckBox showSquares) {
+    public SpiralDraw(JRadioButton anticlockwiseRadio, JCheckBox[] checkBoxs, JCheckBox showSquares, JSlider angulo) {
         this.anticlockwiseRadio = anticlockwiseRadio;
         this.checkBoxs = checkBoxs;
+        this.angulo = angulo;
         ChangeListener changeListener = new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 repaint();
             }
         };
+        angulo.addChangeListener(changeListener);
         anticlockwiseRadio.addChangeListener(changeListener);
         for (int index = 0; index < checkBoxs.length; index++) {
             this.checkBoxs[index].addChangeListener(changeListener);
@@ -84,7 +90,9 @@ public class SpiralDraw extends JPanel implements MouseListener, MouseMotionList
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        double angulo = (this.angulo.getValue()* Math.PI / 180);
         Graphics2D g2d = (Graphics2D) g;
+        g2d.rotate(angulo, x, y);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         for (int index = 0; index < colors.length; index++) {
@@ -97,6 +105,7 @@ public class SpiralDraw extends JPanel implements MouseListener, MouseMotionList
                 }
             }
         }
+        g2d.rotate(-angulo, x, y);
     }
 
     /**

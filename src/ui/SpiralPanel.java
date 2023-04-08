@@ -6,6 +6,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 
 public class SpiralPanel extends JScrollPane {
     private int drawHeight;
@@ -15,11 +16,11 @@ public class SpiralPanel extends JScrollPane {
     private JPanel container;
 
     public SpiralPanel(int width, int height, int margin, JRadioButton anticlockwiseRadio, JCheckBox[] checkBoxs,
-            JCheckBox showSquares) {
+            JCheckBox showSquares, JSlider angulo) {
         this.drawWidth = width;
         this.drawHeight = height;
         this.drawMargin = margin;
-        panelGraph = new SpiralDraw(anticlockwiseRadio, checkBoxs, showSquares);
+        panelGraph = new SpiralDraw(anticlockwiseRadio, checkBoxs, showSquares,angulo);
         container = new JPanel(null);
         container.add(panelGraph);
         panelGraph.setBounds(drawMargin, drawMargin, drawWidth, drawHeight);
