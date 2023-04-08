@@ -1,12 +1,11 @@
 import java.awt.Dimension;
-
 import javax.swing.JFrame;
-
-import ui.SpiralPanel;
+import javax.swing.JPanel;
+import ui.SpiralMain;
 
 public class App {
-    
-    /** 
+
+    /**
      * @param args
      * @throws Exception
      */
@@ -25,8 +24,8 @@ public class App {
         int x = 1620;
         int y = 1005;
 
-        SpiralPanel spiral = new SpiralPanel(x, y, 5);
-        frame.getContentPane().add(spiral);
+        JPanel panel = new SpiralMain(x, y);
+        frame.getContentPane().add(panel);
         frame.pack();
         frame.setVisible(true);
     }

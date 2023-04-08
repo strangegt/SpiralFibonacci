@@ -10,17 +10,17 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class SpiralDraw extends JPanel implements MouseListener, MouseMotionListener {
     /**
      * The radius to grag then spiral
      */
     private static final int RADIUS = 10;
-    /**
-     * Draw the rectangles of the spiral
-     */
-    boolean drawRect = false;
 
     /**
      * The x cordinate of the spiral center
@@ -30,11 +30,32 @@ public class SpiralDraw extends JPanel implements MouseListener, MouseMotionList
      * The y cordinate of the spiral center
      */
     private int y = 720;
+    private JCheckBox[] checkBoxs;
+    private JRadioButton anticlockwiseRadio;
+    private JCheckBox showSquares;
 
     /**
      * Constructor
+     * 
+     * @param checkBoxs
+     * @param anticlockwiseRadio
+     * @param showSquares
      */
-    public SpiralDraw() {
+    public SpiralDraw(JRadioButton anticlockwiseRadio, JCheckBox[] checkBoxs, JCheckBox showSquares) {
+        this.anticlockwiseRadio = anticlockwiseRadio;
+        this.checkBoxs = checkBoxs;
+        ChangeListener changeListener = new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                repaint();
+            }
+        };
+        anticlockwiseRadio.addChangeListener(changeListener);
+        for (int index = 0; index < checkBoxs.length; index++) {
+            this.checkBoxs[index].addChangeListener(changeListener);
+        }
+        this.showSquares = showSquares;
+        showSquares.addChangeListener(changeListener);
         // Track mouse clicks
         addMouseListener(this);
         // Track mouse moves
@@ -67,8 +88,14 @@ public class SpiralDraw extends JPanel implements MouseListener, MouseMotionList
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         for (int index = 0; index < colors.length; index++) {
-            g2d.setColor(colors[index]);
-            paintSpiral(g2d, x, y, index, 1, 0, 16 + index);
+            if (checkBoxs[index].isSelected()) {
+                g2d.setColor(colors[index]);
+                if (anticlockwiseRadio.isSelected()) {
+                    paintSpiralLeft(g2d, x, y, index, 1, 0, 16 + index);
+                } else {
+                    paintSpiralRight(g2d, x, y, index, 1, 0, 16 + index);
+                }
+            }
         }
     }
 
@@ -83,52 +110,114 @@ public class SpiralDraw extends JPanel implements MouseListener, MouseMotionList
      * @param prevValue The previous value in the fibonace serie
      * @param max       Max number of interactions
      */
-    private void paintSpiral(Graphics2D g2d, int x, int y, int pos, int value, int prevValue, int max) {
+    private void paintSpiralLeft(Graphics2D g2d, int x, int y, int pos, int value, int prevValue, int max) {
         switch (pos % 4) {
             case 0:
                 // lo dibujamos x,y sup izq
-                if (drawRect)
+                if (showSquares.isSelected())
                     g2d.drawRect(x, y, value, value);
                 g2d.drawArc(x - value, y, value * 2, value * 2, 0, 90);
                 if (pos < max) {
-                    int nextSize = value + prevValue;
-                    paintSpiral(g2d, x - nextSize, y, ++pos, nextSize, value, max);
+                    int nextValue = value + prevValue;
+                    paintSpiralLeft(g2d, x - nextValue, y, ++pos, nextValue, value, max);
                 }
                 break;
             case 1:
                 // lo dibujamos x,y inf d
-                if (drawRect)
+                if (showSquares.isSelected())
                     g2d.drawRect(x, y, value, value);
                 g2d.drawArc(x, y, value * 2, value * 2, 90, 90);
                 if (pos < max) {
-                    int nextSize = value + prevValue;
-                    paintSpiral(g2d, x, y + value, ++pos, nextSize, value, max);
+                    int nextValue = value + prevValue;
+                    paintSpiralLeft(g2d, x, y + value, ++pos, nextValue, value, max);
                 }
                 break;
             case 2:
-                if (drawRect)
+                if (showSquares.isSelected())
                     g2d.drawRect(x, y, value, value);
                 g2d.drawArc(x, y - value, value * 2, value * 2, 180, 90);
                 if (pos < max) {
-                    int nextSize = value + prevValue;
-                    paintSpiral(g2d, x + value, y - prevValue, ++pos, nextSize, value, max);
+                    int nextValue = value + prevValue;
+                    paintSpiralLeft(g2d, x + value, y - prevValue, ++pos, nextValue, value, max);
                 }
                 break;
             case 3:
-                if (drawRect)
+                if (showSquares.isSelected())
                     g2d.drawRect(x, y, value, value);
                 g2d.drawArc(x - value, y - value, value * 2, value * 2, 270, 90);
                 if (pos < max) {
-                    int nextSize = value + prevValue;
-                    paintSpiral(g2d, x - prevValue, y - nextSize, ++pos, nextSize, value, max);
+                    int nextValue = value + prevValue;
+                    paintSpiralLeft(g2d, x - prevValue, y - nextValue, ++pos, nextValue, value, max);
                 }
                 break;
             case 4:
-                if (drawRect)
+                if (showSquares.isSelected())
                     g2d.drawRect(x, y, value, value);
                 if (pos < max) {
-                    int nextSize = value + prevValue;
-                    paintSpiral(g2d, x + value - nextSize, y - nextSize, ++pos, nextSize, value, max);
+                    int nextValue = value + prevValue;
+                    paintSpiralLeft(g2d, x + value - nextValue, y - nextValue, ++pos, nextValue, value, max);
+                }
+                break;
+        }
+    }
+
+    /**
+     * Paint a section of the spiral, does recursive until max
+     * 
+     * @param g2d       The graphics
+     * @param x         The x cordinate of the left position of square
+     * @param y         The y coordinate of the top of square
+     * @param pos       Position of the next square
+     * @param value     Value in the fibonace serie
+     * @param prevValue The previous value in the fibonace serie
+     * @param max       Max number of interactions
+     */
+    private void paintSpiralRight(Graphics2D g2d, int x, int y, int pos, int value, int prevValue, int max) {
+        switch (pos % 4) {
+            case 0:
+                // lo dibujamos x,y sup izq
+                if (showSquares.isSelected())
+                    g2d.drawRect(x, y, value, value);
+                g2d.drawArc(x, y, value * 2, value * 2, 90, 90);
+                if (pos < max) {
+                    int nextValue = value + prevValue;
+                    paintSpiralRight(g2d, x + value, y, ++pos, nextValue, value, max);
+                }
+                break;
+            case 1:
+                // lo dibujamos x,y inf d
+                if (showSquares.isSelected())
+                    g2d.drawRect(x, y, value, value);
+                g2d.drawArc(x - value, y, value * 2, value * 2, 0, 90);
+                if (pos < max) {
+                    int nextValue = value + prevValue;
+                    paintSpiralRight(g2d, x - prevValue, y + value, ++pos, nextValue, value, max);
+                }
+                break;
+            case 2:
+                if (showSquares.isSelected())
+                    g2d.drawRect(x, y, value, value);
+                g2d.drawArc(x - value, y - value, value * 2, value * 2, 270, 90);
+                if (pos < max) {
+                    int nextValue = value + prevValue;
+                    paintSpiralRight(g2d, x - nextValue, y - prevValue, ++pos, nextValue, value, max);
+                }
+                break;
+            case 3:
+                if (showSquares.isSelected())
+                    g2d.drawRect(x, y, value, value);
+                g2d.drawArc(x, y - value, value * 2, value * 2, 180, 90);
+                if (pos < max) {
+                    int nextValue = value + prevValue;
+                    paintSpiralRight(g2d, x, y - nextValue, ++pos, nextValue, value, max);
+                }
+                break;
+            case 4:
+                if (showSquares.isSelected())
+                    g2d.drawRect(x, y, value, value);
+                if (pos < max) {
+                    int nextValue = value + prevValue;
+                    paintSpiralRight(g2d, x + value - nextValue, y - nextValue, ++pos, nextValue, value, max);
                 }
                 break;
         }
@@ -170,7 +259,7 @@ public class SpiralDraw extends JPanel implements MouseListener, MouseMotionList
     }
 
     /**
-     * Start dragging when pressed left button near the center of the spiral
+     * Start dragging when pressed Right button near the center of the spiral
      */
     @Override
     public void mousePressed(java.awt.event.MouseEvent e) {
